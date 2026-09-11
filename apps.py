@@ -3,37 +3,50 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import random
+import base64
 from datetime import datetime, timedelta
+from pathlib import Path
+
+
+def svg_icon(filename, label, size=22):
+    svg_path = Path(__file__).parent / "propsvg" / filename
+    encoded_svg = base64.b64encode(svg_path.read_bytes()).decode("ascii")
+    return f'<img src="data:image/svg+xml;base64,{encoded_svg}" alt="{label}" width="{size}" height="{size}" style="vertical-align: middle; margin-right: 0.35rem;">'
 
 # Page Setup
 st.set_page_config(
     page_title="UtilityPulse Malawi",
-    page_icon="⚡",
+    page_icon=str(Path(__file__).parent / "propsvg" / "utility-pole.svg"),
     layout="wide"
 )
 
 # Header
-st.title("⚡ UtilityPulse Malawi")
+st.markdown(f"<h1>{svg_icon('utility-pole.svg', 'Power')}UtilityPulse Malawi</h1>", unsafe_allow_html=True)
 st.caption("AI-Powered Electricity & Water Outage Early-Warning Platform")
 
 # Sidebar - Quick Settings
-st.sidebar.header("🕹️ Demo Controls")
+st.sidebar.markdown(f"### {svg_icon('layers-arrow-down.svg', 'Controls')}Demo Controls", unsafe_allow_html=True)
 selected_area = st.sidebar.selectbox("Select Business Location", ["Area 25 (Lilongwe)", "Area 47 (Lilongwe)", "Limbe (Blantyre)", "Zomba Central"])
 business_type = st.sidebar.selectbox("Business Type", ["Bakery / Grocery", "Salon / Barber", "Butchery / Cold Room", "Restaurant"])
 
 # Navigation Tabs
-tab1, tab2, tab3 = st.tabs(["📲 WhatsApp Alert Simulator", "📊 Outage Intelligence Dashboard", "⚡ Energy Usage Monitoring"])
+tab1, tab2, tab3 = st.tabs(["WhatsApp Alert Simulator", "Outage Intelligence Dashboard", "Energy Usage Monitoring"])
 
 # ==================== TAB 1: WHATSAPP INTERFACE ====================
 with tab1:
-    st.subheader("📲 WhatsApp Customer Interface")
+    st.markdown(f"### {svg_icon('smartphone.svg', 'WhatsApp')}WhatsApp Customer Interface", unsafe_allow_html=True)
     st.write("Simulating real-time WhatsApp alerts and crowdsourced status updates sent to business owners.")
     
     col1, col2 = st.columns([1, 1])
     
     with col1:
         st.markdown("### Send Crowd Report")
-        status_type = st.radio("Report Status for your area:", ["⚡ Power OFF", "⚡ Power ON", "💧 Water OFF", "💧 Water ON"])
+        st.markdown(
+            f"{svg_icon('utility-pole.svg', 'Power')} Power"
+            f"&nbsp;&nbsp;&nbsp;{svg_icon('droplets.svg', 'Water')} Water",
+            unsafe_allow_html=True,
+        )
+        status_type = st.radio("Report Status for your area:", ["Power OFF", "Power ON", "Water OFF", "Water ON"])
         
         if st.button("Submit WhatsApp Report"):
             st.success(f"Report logged for {selected_area}: '{status_type}'. Thank you for contributing to the crowd-data network!")
@@ -45,19 +58,19 @@ with tab1:
         # WhatsApp Mock UI Box
         st.markdown("""
         <div style="background-color: #075E54; color: white; padding: 10px; border-radius: 10px 10px 0 0; font-weight: bold;">
-            📱 UtilityPulse Bot (WhatsApp)
+            <img src="data:image/svg+xml;base64,""" + svg_icon("smartphone.svg", "WhatsApp", 18).split("base64,")[1].split('"')[0] + """" alt="WhatsApp" width="18" height="18" style="vertical-align: middle; margin-right: 0.35rem; filter: brightness(0) invert(1);"> UtilityPulse Bot (WhatsApp)
         </div>
         <div style="background-color: #E5DDD5; padding: 15px; border-radius: 0 0 10px 10px; font-family: sans-serif;">
             <div style="background-color: #DCF8C6; color: black; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
-                <b>⚠️ OUTAGE WARNING ALERT</b><br>
+                <b><img src="data:image/svg+xml;base64,""" + svg_icon("layers-arrow-down.svg", "Warning", 18).split("base64,")[1].split('"')[0] + """" alt="Warning" width="18" height="18" style="vertical-align: middle;"> OUTAGE WARNING ALERT</b><br>
                 <b>Location:</b> Area 25, Lilongwe<br>
                 <b>Risk Level:</b> HIGH (85% Probability)<br>
                 <b>Expected Time:</b> ~25 Minutes (10:15 AM)<br>
                 <b>Utility:</b> ESCOM Grid Supply<br><br>
-                💡 <i>Action Recommended: Switch bakery ovens to generator backup or complete current batch before 10:10 AM.</i>
+                <i>Action Recommended: Switch bakery ovens to generator backup or complete current batch before 10:10 AM.</i>
             </div>
             <div style="background-color: #FFFFFF; color: black; padding: 10px; border-radius: 8px;">
-                <b>💧 WATER SERVICE UPDATE</b><br>
+                <b><img src="data:image/svg+xml;base64,""" + svg_icon("droplets.svg", "Water", 18).split("base64,")[1].split('"')[0] + """" alt="Water" width="18" height="18" style="vertical-align: middle;"> WATER SERVICE UPDATE</b><br>
                 Water pressure restored in Area 25. Supply stability predicted for the next 12 hours.
             </div>
         </div>
@@ -65,7 +78,7 @@ with tab1:
 
 # ==================== TAB 2: OUTAGE INTELLIGENCE ====================
 with tab2:
-    st.subheader(f"📊 Outage Analytics & Predictions: {selected_area}")
+    st.markdown(f"### {svg_icon('layout-dashboard.svg', 'Dashboard')}Outage Analytics & Predictions: {selected_area}", unsafe_allow_html=True)
     
     # Key Metrics
     m1, m2, m3, m4 = st.columns(4)
@@ -86,7 +99,7 @@ with tab2:
 
 # ==================== TAB 3: ENERGY USAGE MONITORING ====================
 with tab3:
-    st.subheader("⚡ Premium Feature: Energy Usage Monitoring")
+    st.markdown(f"### {svg_icon('utility-pole.svg', 'Power')}Premium Feature: Energy Usage Monitoring", unsafe_allow_html=True)
     st.caption("Real-time power consumption tracking for subscribed commercial accounts.")
     
     col_a, col_b = st.columns([2, 1])
@@ -101,9 +114,10 @@ with tab3:
         st.plotly_chart(fig_energy, use_container_width=True)
         
     with col_b:
-        st.markdown("### 💰 Cost Breakdown Today")
+        st.markdown(f"### {svg_icon('layers-arrow-down.svg', 'Cost')}Cost Breakdown Today", unsafe_allow_html=True)
         st.write("**Grid Power (ESCOM):** MWK 18,400")
         st.write("**Generator Fuel:** MWK 32,000")
         st.write("**Solar / Battery Contribution:** 22%")
         
-        st.info("💡 **AI Efficiency Tip:** Shifting heavy baking cycles from 11:00 AM to 7:00 AM will reduce peak generator reliance and save approx **MWK 45,000/week**.")
+        st.markdown(f"{svg_icon('layers-arrow-down.svg', 'Efficiency')} AI efficiency recommendation", unsafe_allow_html=True)
+        st.info("**AI Efficiency Tip:** Shifting heavy baking cycles from 11:00 AM to 7:00 AM will reduce peak generator reliance and save approx **MWK 45,000/week**.")
